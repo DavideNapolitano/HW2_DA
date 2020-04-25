@@ -51,11 +51,6 @@ class Caltech(VisionDataset):
                     pil=pil_loader(image)
                     data.append(normale) #1
                     
-                    g_scale=tranforms.Greysclale()(pil)
-                    labels_cat.append(folder)
-                    data.append(g_scale) #2
-                    
-                   
 
         labels=[]
         el_root=[i for i in os.listdir(root) if i.find("BACKGROUND")<0]
