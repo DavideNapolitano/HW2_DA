@@ -5,6 +5,10 @@ from PIL import Image
 import os
 import os.path
 import sys
+from skimage.transform import rotate, AffineTransform, warp
+from skimage.util import random_noise
+from skimage.filters import gaussian
+import numpy as np
 
 
 def pil_loader(path):
@@ -37,12 +41,34 @@ class Caltech(VisionDataset):
           #print(folder)
           if folder.find("BACKGROUND")<0:
             for img in os.listdir(root+"/"+folder):
-            #print(img)
+                #print(img)
                 p=folder+"/"+img
                 if p in to_keep:
-                  labels_cat.append(folder)
-                  d=pil_loader(root+"/"+folder+"/"+img)
-                  data.append(d)
+                    labels_cat.append(folder)
+                    image=root+"/"+folder+"/"+img
+                    normale=pil_loader(image)
+                    data.append(normale) #1
+                    rotated=rotate(image, angle=45, mode = 'wrap')
+                    data.append(rotated) #2
+                    labels_cat.append(folder)
+                    transform = AffineTransform(translation=(25,25))
+                    wrapShift = warp(image,transform,mode='wrap')
+                    data.append(wrapShift) #3
+                    labels_cat.append(folder)
+                    flipLR = np.fliplr(image) #4
+                    data.append(flipLR)
+                    labels_cat.append(folder)
+                    flipUD = np.flipud(image) #5
+                    data.append(flipUD)
+                    labels_cat.append(folder) #6
+                    sigma=0.155
+                    #add random noise to the image
+                    noisyRandom = random_noise(image,var=sigma**2)
+                    data.append(noiseRandom) #7
+                    labels_cat.append(folder) 
+                    blurred = gaussian(image,sigma=1,multichannel=True)
+                    data.append(blurred) #8
+                    labels_cat.append(folder)
 
         labels=[]
         el_root=[i for i in os.listdir(root) if i.find("BACKGROUND")<0]
